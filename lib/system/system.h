@@ -2,15 +2,18 @@
 
 #include "event.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct {
-    // Video
+    // Video (Transparent Paging)
     void (*draw_pixel)(uint8_t x, uint8_t y, uint8_t color);
     void (*draw_line)(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color);
     void (*fill_rect)(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color);
     void (*draw_string)(uint8_t x, uint8_t y, const char *s, uint8_t color);
     void (*lcd_update)(void);
-    void (*lcd_clear)(void);
+
+    // Runtime paging configuration
+    void (*set_render_callback)(void (*callback)(void));
 
     // Audio
     void (*play_tone)(uint16_t freq);
@@ -29,6 +32,4 @@ typedef struct {
     void (*log)(const char *fmt, ...);
 } system_api_t;
 
-// The global API table instance
 extern const system_api_t system_api;
-
