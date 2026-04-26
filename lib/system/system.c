@@ -29,7 +29,7 @@ static void system_lcd_update(void) {
 static void log_dummy(const char *fmt, ...) { (void)fmt; }
 #endif
 
-const system_api_t system_api = {
+const system_api_t system_api __attribute__((section(".system_api"))) = {
     .draw_pixel = gfx_draw_pixel,
     .draw_line = gfx_draw_line,
     .fill_rect = gfx_fill_rect,

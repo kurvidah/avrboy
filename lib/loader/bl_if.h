@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#define BL_CMD_ADDR ((volatile bl_cmd_t*)0x0100)
+#define BL_CMD_ADDR ((volatile bl_cmd_t*)0x0700)
 
 #define BL_CMD_NONE   0
 #define BL_CMD_WRITE  1

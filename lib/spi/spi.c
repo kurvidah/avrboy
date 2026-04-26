@@ -14,16 +14,27 @@ void spi_init() {
     // Set MOSI, SCK as output; MISO as input
     SPI_DDR |= (1 << MOSI) | (1 << SCK) | (1 << CS);
     SPI_DDR &= ~(1 << MISO);
+    SPI_PORT |= (1 << MISO); // Enable internal pull-up on MISO
 
-    // Enable SPI, Master mode
-    SPCR = (1 << SPE) | (1 << MSTR) | (1 << CPOL) | (1 << CPHA) ;
+    // Enable SPI, Master mode, Mode 0 (CPOL=0, CPHA=0)
+    SPCR = (1 << SPE) | (1 << MSTR);
+    
+    spi_set_speed(0); // Start slow
+}
 
-    // Keep SPI clock at ~2MHz
-    if (F_CPU > 8000000UL) { // fosc/4
-        SPCR |= (1 << SPR0); 
+void spi_set_speed(uint8_t fast) {
+    if (fast) {
+        // Fast: fosc/16 (1MHz @ 16MHz)
+        SPCR |= (1 << SPR0);
+        SPCR &= ~(1 << SPR1);
+        SPSR &= ~(1 << SPI2X);
     } else {
-        SPSR |= (1 << SPI2X); // fosc/2
+        // Slow: fosc/64 (250kHz @ 16MHz)
+        SPCR |= (1 << SPR1);
+        SPCR &= ~(1 << SPR0);
+        SPSR &= ~(1 << SPI2X);
     }
+    _delay_ms(10);
 }
 
 uint8_t spi_write(uint8_t data) {

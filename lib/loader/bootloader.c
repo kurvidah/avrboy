@@ -60,4 +60,5 @@ void bootloader_main(void) {
     cmd->cmd = BL_CMD_NONE;
 
     asm volatile ("sei");
-}
+    asm volatile ("ret");
+    }

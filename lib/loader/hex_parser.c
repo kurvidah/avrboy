@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 #define PAGE_SIZE 128
-#define APP_START 0x2000
+#define APP_START 0x3000
 
 // ---- External function (you already have this) ----
 extern void flash_page(uint16_t addr, uint8_t* data);
