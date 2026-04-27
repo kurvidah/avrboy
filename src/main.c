@@ -18,6 +18,7 @@
 typedef enum {
     STATE_BOOT,
     STATE_MENU,
+    STATE_PRE_LOAD, 
     STATE_LOADING,
     STATE_RUNNING,
     STATE_ERROR
@@ -88,8 +89,7 @@ void flash_program(const char* filename) {
     }
 
     system_api.log("OS: Done. Jumping...");
-    _delay_ms(100);
-    cli();
+    _delay_ms(500);
     jump_to_app();
 }
 
@@ -121,6 +121,7 @@ void render_frame(void) {
             }
             break;
 
+        case STATE_PRE_LOAD:
         case STATE_LOADING:
             system_api.draw_string(25, 30, "FLASHING...", 1);
             break;
@@ -128,6 +129,11 @@ void render_frame(void) {
         case STATE_ERROR:
             system_api.draw_string(15, 30, "SD ERROR!", 1);
             break;
+
+        case STATE_RUNNING:
+            break;
+            
+        default: break;
     }
 }
 
@@ -137,17 +143,26 @@ void handle_events(void) {
     Event e;
     while (system_api.poll_event(&e)) {
         if (e.type == EVENT_BTN_DOWN) {
+            // Re-scan SD if UP+DOWN are pressed
+            if ((e.data1 & (BTN_UP | BTN_DOWN)) == (BTN_UP | BTN_DOWN)) {
+                scan_sd();
+                return;
+            }
+
             if (current_state == STATE_MENU && file_count > 0) {
                 if (e.data1 & BTN_UP)   menu_index = (menu_index > 0) ? menu_index - 1 : file_count - 1;
                 if (e.data1 & BTN_DOWN) menu_index = (menu_index < file_count - 1) ? menu_index + 1 : 0;
                 
                 if (e.data1 & (BTN_A | BTN_RIGHT)) {
-                    system_api.log("OS: Selected %s", file_list[menu_index]);
-                    current_state = STATE_LOADING;
+                    current_state = STATE_PRE_LOAD;
                     system_api.play_tone(880);
                     _delay_ms(100);
                     system_api.play_tone(0);
                 }
+            }
+        } else if (e.type == EVENT_BTN_UP) {
+            if (current_state == STATE_PRE_LOAD) {
+                current_state = STATE_LOADING;
             }
         }
     }
@@ -159,7 +174,6 @@ int main(void) {
     spi_init();
     lcd_init();
     uart_init(9600);
-    // mpu6050_init();
     event_init();
     timer_init();
     input_init();
