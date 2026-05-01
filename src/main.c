@@ -1,4 +1,5 @@
 #include "system.h"
+#include "pff.h"
 #include "spi.h"
 #include "lcd.h"
 #include "uart.h"
@@ -7,7 +8,6 @@
 #include "timer.h"
 #include "audio.h"
 #include "mpu6050.h"
-#include "pff.h"
 #include "loader.h"
 #include <avr/interrupt.h>
 #include <util/delay.h>

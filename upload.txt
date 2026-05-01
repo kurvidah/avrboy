@@ -1,0 +1,66 @@
+Processing ATmega328P (platform: atmelavr; board: ATmega328P)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/atmelavr/ATmega328P.html
+PLATFORM: Atmel AVR (5.1.0) > ATmega328P/PA
+HARDWARE: ATMEGA328P 8MHz, 2KB RAM, 32KB Flash
+DEBUG: Current (avr-stub) External (avr-stub, simavr)
+PACKAGES: 
+ - tool-avrdude @ 1.60300.200527 (6.3.0) 
+ - toolchain-atmelavr @ 1.70300.191015 (7.3.0)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 0 compatible libraries
+Scanning dependencies...
+No dependencies
+Building in release mode
+Compiling .pio/build/ATmega328P/src/main.o
+Processing ATmega328P (platform: atmelavr; board: ATmega328P)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/atmelavr/ATmega328P.html
+PLATFORM: Atmel AVR (5.1.0) > ATmega328P/PA
+HARDWARE: ATMEGA328P 8MHz, 2KB RAM, 32KB Flash
+DEBUG: Current (avr-stub) External (avr-stub, simavr)
+PACKAGES: 
+ - tool-avrdude @ 1.60300.200527 (6.3.0) 
+ - toolchain-atmelavr @ 1.70300.191015 (7.3.0)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 0 compatible libraries
+Scanning dependencies...
+No dependencies
+Building in release mode
+Compiling .pio/build/ATmega328P/src/main.o
+Linking .pio/build/ATmega328P/firmware.elf
+Processing ATmega328P (platform: atmelavr; board: ATmega328P)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/atmelavr/ATmega328P.html
+PLATFORM: Atmel AVR (5.1.0) > ATmega328P/PA
+HARDWARE: ATMEGA328P 8MHz, 2KB RAM, 32KB Flash
+DEBUG: Current (avr-stub) External (avr-stub, simavr)
+PACKAGES: 
+ - tool-avrdude @ 1.60300.200527 (6.3.0) 
+ - toolchain-atmelavr @ 1.70300.191015 (7.3.0)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 0 compatible libraries
+Scanning dependencies...
+No dependencies
+Building in release mode
+Compiling .pio/build/ATmega328P/src/lcd.o
+Compiling .pio/build/ATmega328P/src/main.o
+Compiling .pio/build/ATmega328P/src/spi.o
+Linking .pio/build/ATmega328P/firmware.elf
+Checking size .pio/build/ATmega328P/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=====     ]  50.0% (used 1024 bytes from 2048 bytes)
+Flash: [==        ]  17.7% (used 5812 bytes from 32768 bytes)
+Building .pio/build/ATmega328P/firmware.hex
+Configuring upload protocol...
+AVAILABLE: usbasp
+CURRENT: upload_protocol = usbasp
+Looking for upload port...
+Uploading .pio/build/ATmega328P/firmware.hex
+========================= [SUCCESS] Took 7.75 seconds =========================

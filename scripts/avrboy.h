@@ -26,8 +26,13 @@ typedef struct {
     void (*log)(const char *fmt, ...);
 } system_api_t;
 
-/* The OS places the API at 0x1FC0 */
-#define system_api (*((const system_api_t*)0x1FC0))
+#ifdef SIMULATOR
+extern const system_api_t* sim_api_ptr;
+#define system_api (*sim_api_ptr)
+#else
+/* The OS places a pointer to the API at 0x2FC0 (64 bytes before 0x3000) */
+#define system_api (**((const system_api_t**)0x2FC0))
+#endif
 
 #define BTN_UP    (1 << 0)
 #define BTN_DOWN  (1 << 1)
@@ -39,4 +44,20 @@ typedef struct {
 #define EVENT_BTN_DOWN 1
 #define EVENT_BTN_UP   2
 
+#ifdef SIMULATOR
+#define MAIN_ENTRY() int app_main(void)
+#else
+#define MAIN_ENTRY() int main(void)
 #endif
+
+/* Standard entry point macro */
+#ifdef SIMULATOR
+#define BOOT_ENTRY()
+#else
+#define BOOT_ENTRY() \
+    void __attribute__((section(".vectors"))) _entry(void) { \
+        asm volatile("jmp main"); \
+    }
+#endif
+
+#endif // AVRBOY_H
