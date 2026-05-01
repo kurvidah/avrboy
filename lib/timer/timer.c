@@ -1,5 +1,6 @@
 #include "timer.h"
 #include "event.h"
+#include "input.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -32,6 +33,9 @@ ISR(TIMER1_COMPA_vect) {
     system_ticks++;
     tick_flag = 1;
     
+    // Sample hardware in background
+    input_poll();
+
     // Push a tick event to the queue
     event_push(EVENT_TICK, (uint8_t)(system_ticks & 0xFF), 0);
 }

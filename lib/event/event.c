@@ -1,7 +1,7 @@
 #include "event.h"
 #include <avr/interrupt.h>
 
-#define EVENT_QUEUE_SIZE 8
+#define EVENT_QUEUE_SIZE 32
 
 static Event event_queue[EVENT_QUEUE_SIZE];
 static volatile uint8_t head = 0;

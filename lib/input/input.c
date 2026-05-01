@@ -16,25 +16,27 @@ void input_init(void) {
 }
 
 void input_poll(void) {
-    // 1. Digital Buttons (Active Low)
-    uint8_t current_raw = ~INPUT_PIN; // Invert so 1 = pressed
-    uint8_t current_btns = current_raw & 0x3F; // Only mask PC0-PC5
+    // 1. Digital Buttons (Active Low) - Full 60Hz
+    uint8_t current_raw = ~INPUT_PIN; 
+    uint8_t current_btns = current_raw & 0x3F;
 
-    // Detect changes (Pressed)
     uint8_t changed_down = current_btns & ~last_btn_state;
     if (changed_down) {
-        event_push(EVENT_BTN_DOWN, changed_down, 0);
+        event_push(EVENT_BTN_DOWN, current_btns, 0);
     }
 
-    // Detect changes (Released)
     uint8_t changed_up = ~current_btns & last_btn_state;
     if (changed_up) {
-        event_push(EVENT_BTN_UP, changed_up, 0);
+        event_push(EVENT_BTN_UP, current_btns, 0);
     }
 
     last_btn_state = current_btns;
 
-    // 2. Analog Joystick on A6 and A7
+    // 2. Analog Joystick - Throttled (every 4th tick)
+    static uint8_t adc_counter = 0;
+    if (++adc_counter < 4) return;
+    adc_counter = 0;
+
     static uint16_t last_x = 512, last_y = 512;
     uint16_t x = adc_read(6);
     uint16_t y = adc_read(7);

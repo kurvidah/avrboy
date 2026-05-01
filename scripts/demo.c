@@ -1,4 +1,5 @@
 #include "avrboy.h"
+#include <avr/interrupt.h>
 
 // Standard entry point
 BOOT_ENTRY()
@@ -19,6 +20,9 @@ void render(void) {
 }
 
 MAIN_ENTRY() {
+    // CRITICAL: Re-enable interrupts so the System Timer can poll inputs
+    sei();
+
     system_api.log("Demo started");
     system_api.set_render_callback(render);
     
@@ -33,6 +37,7 @@ MAIN_ENTRY() {
                 
                 if (e.data1 & BTN_B) {
                     // Soft reset to OS
+                    system_api.log("Exiting to OS...");
                     ((void (*)(void))0x0000)();
                 }
             }

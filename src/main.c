@@ -208,7 +208,6 @@ int main(void) {
     }
 
     while (1) {
-        input_poll();
         handle_events();
 
         if (current_state == STATE_LOADING) {
