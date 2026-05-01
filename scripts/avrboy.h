@@ -49,10 +49,7 @@ extern const system_api_t* sim_api_ptr;
 #define BOOT_ENTRY()
 #define MAIN_ENTRY() int app_main(void)
 #else
-#define BOOT_ENTRY() \
-    void __attribute__((section(".entry"), naked)) _entry(void) { \
-        asm volatile("jmp main"); \
-    }
+#define BOOT_ENTRY() 
 #define MAIN_ENTRY() int main(void)
 #endif
 

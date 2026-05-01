@@ -179,6 +179,7 @@ int main(void) {
     uart_log("OS: START");
 
     // Copy System API to RAM Bridge at 0x0100
+    // Standard pointers CANNOT read from Flash on AVR, so we must bridge it to RAM.
     extern const system_api_t system_api;
     for (uint8_t i = 0; i < sizeof(system_api_t); i++) {
         ((uint8_t*)0x0100)[i] = pgm_read_byte(((const uint8_t*)&system_api) + i);
@@ -194,15 +195,14 @@ int main(void) {
 
     uart_log("OS: READY");
 
-    system_api_t* api = (system_api_t*)0x0100;
-    api->set_render_callback(render_frame);
+    set_render_callback(render_frame);
 
     FRESULT res = pf_mount(&fs);
     if (res != FR_OK) {
-        api->log("OS: Mount Fail %d", res);
+        uart_log("OS: Mount Fail %d", res);
         current_state = STATE_ERROR;
     } else {
-        api->log("OS: SD Mount OK");
+        uart_log("OS: SD Mount OK");
         scan_sd();
         current_state = STATE_MENU;
     }
@@ -216,7 +216,7 @@ int main(void) {
             current_state = STATE_ERROR;
         }
 
-        api->lcd_update();
-        api->wait_tick();
+        system_lcd_update();
+        timer_wait_tick();
     }
 }

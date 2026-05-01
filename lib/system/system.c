@@ -11,11 +11,11 @@
 
 static void (*render_cb)(void) = NULL;
 
-static void set_render_callback(void (*callback)(void)) {
+void set_render_callback(void (*callback)(void)) {
     render_cb = callback;
 }
 
-static void system_lcd_update(void) {
+void system_lcd_update(void) {
     if (!render_cb) return;
 
     for (uint8_t p = 0; p < LCD_PAGES; p++) {

@@ -33,3 +33,6 @@ typedef struct {
 } system_api_t;
 
 extern const system_api_t system_api;
+
+void set_render_callback(void (*callback)(void));
+void system_lcd_update(void);

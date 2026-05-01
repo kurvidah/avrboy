@@ -16,15 +16,12 @@ OUTPUT="${BASENAME^^}.HEX"
 
 echo "Building AVRboy Cartridge: $INPUT_FILE -> $OUTPUT"
 
-# 1. Compile with the correct text section start address
-# We use -nostartfiles to keep the app tiny, as the OS handles basics.
-# We move .data to 0x800540 to avoid overwriting the OS data starting at 0x0140.
-# We explicitly place the .entry section at 0x4000.
+# 1. Compile as a standard AVR program linked at 0x4000
+# We REMOVE -nostartfiles so the C runtime handles RAM initialization.
+# We move .data to 0x800540 to start after the OS RAM region.
 avr-gcc -mmcu=$MCU -DF_CPU=$F_CPU -Os -I. \
-    -Wl,--section-start=.entry=$APP_START \
-    -Wl,-Ttext=0x4004 \
+    -Wl,-Ttext=$APP_START \
     -Wl,--section-start=.data=0x800540 \
-    -nostartfiles \
     "$INPUT_FILE" -o app.elf
 
 # 2. Convert to Intel HEX format
