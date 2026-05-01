@@ -2,6 +2,7 @@
 #include "pff.h"
 #include "spi.h"
 #include "lcd.h"
+#include "gfx.h"
 #include "uart.h"
 #include "input.h"
 #include "event.h"
@@ -60,12 +61,12 @@ void scan_sd(void) {
 
 void flash_program(const char* filename) {
     if (pf_open(&fs, filename) != FR_OK) {
-        system_api.log("OS: Open Fail");
+        uart_log("OS: Open Fail");
         current_state = STATE_ERROR;
         return;
     }
 
-    system_api.log("OS: Flashing %s...", filename);
+    uart_log("OS: Flashing %s...", filename);
     hex_parser_init();
 
     char line[64];
@@ -88,7 +89,7 @@ void flash_program(const char* filename) {
         }
     }
 
-    system_api.log("OS: Done. Jumping...");
+    uart_log("OS: Done. Jumping...");
     _delay_ms(500);
     jump_to_app();
 }
@@ -96,26 +97,26 @@ void flash_program(const char* filename) {
 // ── Rendering ────────────────────────────────────────────────────────────────
 
 void render_frame(void) {
-    system_api.draw_string(2, 1, "AVRBOY OS v1.2", 1);
-    system_api.draw_line(0, 10, 127, 10, 1);
+    gfx_draw_string(2, 1, "AVRBOY OS v1.2", 1);
+    gfx_draw_line(0, 10, 127, 10, 1);
 
     switch (current_state) {
         case STATE_BOOT:
-            system_api.draw_string(30, 30, "MOUNTING SD...", 1);
+            gfx_draw_string(30, 30, "MOUNTING SD...", 1);
             break;
 
         case STATE_MENU:
             if (file_count == 0) {
-                system_api.draw_string(20, 30, "NO .HEX FILES", 1);
+                gfx_draw_string(20, 30, "NO .HEX FILES", 1);
             } else {
-                system_api.draw_string(2, 13, "SELECT CARTRIDGE:", 1);
+                gfx_draw_string(2, 13, "SELECT CARTRIDGE:", 1);
                 for (uint8_t i = 0; i < file_count; i++) {
                     uint8_t y = 25 + (i * 9);
                     if (i == menu_index) {
-                        system_api.fill_rect(0, y - 1, 127, 8, 1);
-                        system_api.draw_string(10, y, file_list[i], 0);
+                        gfx_fill_rect(0, y - 1, 127, 8, 1);
+                        gfx_draw_string(10, y, file_list[i], 0);
                     } else {
-                        system_api.draw_string(10, y, file_list[i], 1);
+                        gfx_draw_string(10, y, file_list[i], 1);
                     }
                 }
             }
@@ -123,11 +124,11 @@ void render_frame(void) {
 
         case STATE_PRE_LOAD:
         case STATE_LOADING:
-            system_api.draw_string(25, 30, "FLASHING...", 1);
+            gfx_draw_string(25, 30, "FLASHING...", 1);
             break;
 
         case STATE_ERROR:
-            system_api.draw_string(15, 30, "SD ERROR!", 1);
+            gfx_draw_string(15, 30, "SD ERROR!", 1);
             break;
 
         case STATE_RUNNING:
@@ -141,7 +142,7 @@ void render_frame(void) {
 
 void handle_events(void) {
     Event e;
-    while (system_api.poll_event(&e)) {
+    while (event_poll(&e)) {
         if (e.type == EVENT_BTN_DOWN) {
             // Re-scan SD if UP+DOWN are pressed
             if ((e.data1 & (BTN_UP | BTN_DOWN)) == (BTN_UP | BTN_DOWN)) {
@@ -155,9 +156,9 @@ void handle_events(void) {
                 
                 if (e.data1 & (BTN_A | BTN_RIGHT)) {
                     current_state = STATE_PRE_LOAD;
-                    system_api.play_tone(880);
+                    audio_play_tone(880);
                     _delay_ms(100);
-                    system_api.play_tone(0);
+                    audio_play_tone(0);
                 }
             }
         } else if (e.type == EVENT_BTN_UP) {
@@ -168,26 +169,40 @@ void handle_events(void) {
     }
 }
 
+#include <avr/pgmspace.h>
+
 // ── Main Entry ────────────────────────────────────────────────────────────────
 
 int main(void) {
+    uart_init(9600);
+    _delay_ms(100);
+    uart_log("OS: START");
+
+    // Copy System API to RAM Bridge at 0x0100
+    extern const system_api_t system_api;
+    for (uint8_t i = 0; i < sizeof(system_api_t); i++) {
+        ((uint8_t*)0x0100)[i] = pgm_read_byte(((const uint8_t*)&system_api) + i);
+    }
+
     spi_init();
     lcd_init();
-    uart_init(9600);
     event_init();
     timer_init();
     input_init();
     audio_init();
     sei();
 
-    system_api.set_render_callback(render_frame);
+    uart_log("OS: READY");
+
+    system_api_t* api = (system_api_t*)0x0100;
+    api->set_render_callback(render_frame);
 
     FRESULT res = pf_mount(&fs);
     if (res != FR_OK) {
-        system_api.log("OS: Mount Fail %d", res);
+        api->log("OS: Mount Fail %d", res);
         current_state = STATE_ERROR;
     } else {
-        system_api.log("OS: SD Mount OK");
+        api->log("OS: SD Mount OK");
         scan_sd();
         current_state = STATE_MENU;
     }
@@ -201,7 +216,7 @@ int main(void) {
             current_state = STATE_ERROR;
         }
 
-        system_api.lcd_update();
-        system_api.wait_tick();
+        api->lcd_update();
+        api->wait_tick();
     }
 }

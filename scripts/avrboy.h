@@ -30,8 +30,8 @@ typedef struct {
 extern const system_api_t* sim_api_ptr;
 #define system_api (*sim_api_ptr)
 #else
-/* The OS places a pointer to the API at 0x2FC0 (64 bytes before 0x3000) */
-#define system_api (**((const system_api_t**)0x2FC0))
+/* The OS copies the API table to RAM 0x0100 at startup */
+#define system_api (*((const system_api_t*)0x0100))
 #endif
 
 #define BTN_UP    (1 << 0)
@@ -44,20 +44,16 @@ extern const system_api_t* sim_api_ptr;
 #define EVENT_BTN_DOWN 1
 #define EVENT_BTN_UP   2
 
-#ifdef SIMULATOR
-#define MAIN_ENTRY() int app_main(void)
-#else
-#define MAIN_ENTRY() int main(void)
-#endif
-
 /* Standard entry point macro */
 #ifdef SIMULATOR
 #define BOOT_ENTRY()
+#define MAIN_ENTRY() int app_main(void)
 #else
 #define BOOT_ENTRY() \
-    void __attribute__((section(".vectors"))) _entry(void) { \
+    void __attribute__((section(".entry"), naked)) _entry(void) { \
         asm volatile("jmp main"); \
     }
+#define MAIN_ENTRY() int main(void)
 #endif
 
 #endif // AVRBOY_H
