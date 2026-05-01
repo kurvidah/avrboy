@@ -54,25 +54,23 @@ APP_MAIN() {
             if (e.type == EVENT_JOY_MOVE) {
                 jx = e.data1;
                 jy = e.data2;
-            } else if (e.type == EVENT_BTN_DOWN) {
+            } else if (e.type == EVENT_BTN_DOWN || e.type == EVENT_BTN_UP) {
                 btns = e.data1;
                 
-                // Play specific tones for each button
+                // Recalculate tone based on current button state
                 if (btns & BTN_UP)         system_api.play_tone(440); // A4
                 else if (btns & BTN_DOWN)  system_api.play_tone(392); // G4
                 else if (btns & BTN_LEFT)  system_api.play_tone(349); // F4
                 else if (btns & BTN_RIGHT) system_api.play_tone(330); // E4
                 else if (btns & BTN_A)     system_api.play_tone(523); // C5
                 else if (btns & BTN_B)     system_api.play_tone(587); // D5
+                else                       system_api.play_tone(0);   // Stop if none
 
                 // Exit combo
-                if ((btns & (BTN_A | BTN_B)) == (BTN_A | BTN_B)) {
+                if (e.type == EVENT_BTN_DOWN && (btns & (BTN_A | BTN_B)) == (BTN_A | BTN_B)) {
                     system_api.play_tone(0);
                     ((void (*)(void))0x0000)();
                 }
-            } else if (e.type == EVENT_BTN_UP) {
-                btns = e.data1;
-                if (btns == 0) system_api.play_tone(0); // Stop if all released
             }
         }
         
