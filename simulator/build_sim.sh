@@ -13,6 +13,6 @@ echo "Building AVRboy Simulator with: $INPUT_FILE"
 gcc -DSIMULATOR -I../scripts \
     main.c "../scripts/$INPUT_FILE" \
     -o "$OUTPUT" \
-    $(pkg-config --cflags --libs sdl2)
+    $(pkg-config --cflags --libs sdl2) -lm
 
 echo "Done! Run ./$OUTPUT to start simulation."

@@ -3,8 +3,11 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifndef SIMULATOR
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
+#endif
 
 /* --- System Structures --- */
 

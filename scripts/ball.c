@@ -1,5 +1,4 @@
 #include "avrboy.h"
-#include <avr/interrupt.h>
 
 static int16_t x = 64, y = 32;
 static int8_t dx = 2, dy = 1;

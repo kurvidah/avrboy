@@ -1,5 +1,4 @@
 #include "avrboy.h"
-#include <avr/interrupt.h>
 
 static int16_t posX = 64, posY = 32;
 static uint16_t frame_count = 0;
