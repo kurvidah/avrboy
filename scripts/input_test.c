@@ -1,8 +1,6 @@
 #include "avrboy.h"
 #include <avr/interrupt.h>
 
-BOOT_ENTRY()
-
 static uint8_t buttons = 0;
 static uint32_t last_log = 0;
 
@@ -24,9 +22,7 @@ void render(void) {
     system_api.draw_string(2, 40, "B: EXIT TO OS", 1);
 }
 
-MAIN_ENTRY() {
-    sei(); // Enable interrupts for events
-    
+APP_MAIN() {
     system_api.log("Input Test Init");
     system_api.set_render_callback(render);
     

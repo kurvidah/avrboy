@@ -1,9 +1,6 @@
 #include "avrboy.h"
 #include <avr/interrupt.h>
 
-// Standard entry point
-BOOT_ENTRY()
-
 static int16_t posX = 64, posY = 32;
 static uint16_t frame_count = 0;
 
@@ -19,10 +16,7 @@ void render(void) {
     // system_api.log("Frame: %d", frame_count);
 }
 
-MAIN_ENTRY() {
-    // CRITICAL: Re-enable interrupts so the System Timer can poll inputs
-    sei();
-
+APP_MAIN() {
     system_api.log("Demo started");
     system_api.set_render_callback(render);
     

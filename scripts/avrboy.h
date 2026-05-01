@@ -3,13 +3,22 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 
-/* Matches the OS definition for the System API */
+/* --- System Structures --- */
+
 typedef struct {
     uint8_t type;
     uint8_t data1;
     uint8_t data2;
 } Event;
+
+typedef struct {
+    int16_t ax, ay, az;
+    int16_t gx, gy, gz;
+    int16_t temp;
+} mpu_data_t;
 
 typedef struct {
     void (*draw_pixel)(uint8_t x, uint8_t y, uint8_t color);
@@ -22,17 +31,29 @@ typedef struct {
     bool (*poll_event)(Event* e);
     uint32_t (*get_tick)(void);
     void (*wait_tick)(void);
-    void (*mpu_read)(void* data);
+    void (*mpu_read)(mpu_data_t* data);
     void (*log)(const char *fmt, ...);
 } system_api_t;
 
+/* --- API Bridge --- */
+
 #ifdef SIMULATOR
-extern const system_api_t* sim_api_ptr;
-#define system_api (*sim_api_ptr)
+    extern const system_api_t* sim_api_ptr;
+    #define system_api (*sim_api_ptr)
+    #define APP_MAIN() int app_main(void)
 #else
-/* The OS copies the API table to RAM 0x0100 at startup */
-#define system_api (*((const system_api_t*)0x0100))
+    /* OS Bridge at 0x0100 */
+    #define system_api (*((const system_api_t*)0x0100))
+    #define APP_MAIN() \
+        int avrboy_main(void); \
+        int main(void) { \
+            sei(); \
+            return avrboy_main(); \
+        } \
+        int avrboy_main(void)
 #endif
+
+/* --- Constants --- */
 
 #define BTN_UP    (1 << 0)
 #define BTN_DOWN  (1 << 1)
@@ -43,14 +64,7 @@ extern const system_api_t* sim_api_ptr;
 
 #define EVENT_BTN_DOWN 1
 #define EVENT_BTN_UP   2
-
-/* Standard entry point macro */
-#ifdef SIMULATOR
-#define BOOT_ENTRY()
-#define MAIN_ENTRY() int app_main(void)
-#else
-#define BOOT_ENTRY() 
-#define MAIN_ENTRY() int main(void)
-#endif
+#define EVENT_JOY_MOVE 3
+#define EVENT_TICK     4
 
 #endif // AVRBOY_H

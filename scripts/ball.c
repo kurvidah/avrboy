@@ -1,8 +1,6 @@
 #include "avrboy.h"
 #include <avr/interrupt.h>
 
-BOOT_ENTRY()
-
 static int16_t x = 64, y = 32;
 static int8_t dx = 2, dy = 1;
 
@@ -15,12 +13,8 @@ void render(void) {
     system_api.fill_rect(x, y, 4, 4, 1);
 }
 
-MAIN_ENTRY() {
+APP_MAIN() {
     system_api.log("Ball Demo Start");
-    
-    // CRITICAL: Re-enable interrupts for timers/events
-    sei();
-    
     system_api.set_render_callback(render);
     
     while (1) {
