@@ -2,21 +2,23 @@
 
 #include <stdint.h>
 
-// Buttons moved to PORTC (A0-A5) to be adjacent and avoid PD3 conflict
-#define INPUT_PORT PORTC
-#define INPUT_PIN  PINC
-#define INPUT_DDR  DDRC
+// Port C Buttons
+#define PORTC_MASK_UP    (1 << 2) // PC2
+#define PORTC_MASK_DOWN  (1 << 3) // PC3
 
-#define MASK_UP    (1 << 0) // A0
-#define MASK_DOWN  (1 << 1) // A1
-#define MASK_LEFT  (1 << 2) // A2
-#define MASK_RIGHT (1 << 3) // A3
-#define MASK_A     (1 << 4) // A4
-#define MASK_B     (1 << 5) // A5
+// Port D Buttons
+#define PORTD_MASK_LEFT  (1 << 2) // PD2
+#define PORTD_MASK_RIGHT (1 << 5) // PD5
+#define PORTD_MASK_A     (1 << 6) // PD6
+#define PORTD_MASK_B     (1 << 7) // PD7
 
-// Initialize input pins and ADC for joystick
+// Combined Logical Bitmask (for the system_api events)
+#define BTN_UP    (1 << 0)
+#define BTN_DOWN  (1 << 1)
+#define BTN_LEFT  (1 << 2)
+#define BTN_RIGHT (1 << 3)
+#define BTN_A     (1 << 4)
+#define BTN_B     (1 << 5)
+
 void input_init(void);
-
-// Poll inputs and push events to the queue
 void input_poll(void);
-

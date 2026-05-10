@@ -1,7 +1,7 @@
 # 1. System Overview
 
 ## 1.1 Purpose
-A deterministic, event-driven embedded execution platform for the ATmega328P, supporting SD-based application loading and motion-controlled inputs.
+A deterministic, event-driven embedded execution platform for the ATmega328P (DIP-28), supporting SD-based application loading and motion-controlled inputs.
 
 ---
 
@@ -20,6 +20,7 @@ A deterministic, event-driven embedded execution platform for the ATmega328P, su
 ## 2.3 Input (Interrupt-Driven)
 * The system **shall poll hardware buttons at 60Hz** in the background.
 * The system **shall provide an event queue** for applications to process inputs asynchronously.
+* The system **shall support 2-axis analog joystick and 6 digital buttons**.
 
 ---
 
