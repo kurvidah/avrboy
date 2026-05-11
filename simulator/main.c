@@ -152,11 +152,48 @@ static void sim_play_tone(uint16_t freq) {
 
 static uint8_t btn_state = 0;
 static uint8_t joy_x = 128, joy_y = 128; // Center
+static mpu_data_t sim_mpu = {0};
 
 static bool sim_poll_event(Event* e) {
     SDL_Event sev;
     while (SDL_PollEvent(&sev)) {
         if (sev.type == SDL_QUIT) exit(0);
+        
+        if (sev.type == SDL_MOUSEMOTION) {
+            int mx, my, ww, wh;
+            SDL_GetMouseState(&mx, &my);
+            SDL_GetWindowSize(window, &ww, &wh);
+            
+            // Calculate offset from center in pixels
+            float fx = (float)(mx - ww/2) / (float)(ww/2);
+            float fy = (float)(my - wh/2) / (float)(wh/2);
+            
+            // Deadzone (2% of screen)
+            if (fabsf(fx) < 0.02f) fx = 0;
+            if (fabsf(fy) < 0.02f) fy = 0;
+
+            // Map to +/- 18000 (180.00 degrees)
+            sim_mpu.gx = (int16_t)(fx * 18000.0f);
+            sim_mpu.gy = (int16_t)(fy * 18000.0f);
+            
+            // ax, ay (Instantaneous Force from mouse delta)
+            sim_mpu.ax = sev.motion.xrel * 500;
+            sim_mpu.ay = sev.motion.yrel * 500;
+            
+            // Dynamic AZ: Gravity shifts as you tilt
+            float tilt = sqrtf(fx*fx + fy*fy); 
+            if (tilt > 1.0f) tilt = 1.0f;
+            sim_mpu.az = (int16_t)(16384.0f * (1.0f - tilt));
+        }
+
+        if (sev.type == SDL_WINDOWEVENT && sev.window.event == SDL_WINDOWEVENT_LEAVE) {
+            // Reset to flat when mouse leaves
+            sim_mpu.gx = 0;
+            sim_mpu.gy = 0;
+            sim_mpu.ax = 0;
+            sim_mpu.ay = 0;
+        }
+
         if (sev.type == SDL_KEYDOWN || sev.type == SDL_KEYUP) {
             uint8_t bit = 0;
             bool is_down = (sev.type == SDL_KEYDOWN);
@@ -200,7 +237,7 @@ static bool sim_poll_event(Event* e) {
 
 static uint32_t sim_get_tick(void) { return SDL_GetTicks(); }
 static void sim_wait_tick(void) { SDL_Delay(16); } // ~60fps
-static void sim_mpu_read(mpu_data_t* data) { memset(data, 0, sizeof(mpu_data_t)); }
+static void sim_mpu_read(mpu_data_t* data) { *data = sim_mpu; }
 static void sim_log(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -252,6 +289,7 @@ int main(int argc, char** argv) {
                                 SCREEN_WIDTH, SCREEN_HEIGHT);
 
     sim_api_ptr = &simulator_api;
+    sim_mpu.az = 16384; // Start flat
 
     // Call the application's main
     extern int app_main(void);
