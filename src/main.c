@@ -189,6 +189,7 @@ int main(void) {
     lcd_init();
     event_init();
     timer_init();
+    mpu6050_init();
     input_init();
     audio_init();
     sei();
