@@ -54,8 +54,8 @@ void input_poll(void) {
     adc_counter = 0;
 
     static uint16_t last_x = 512, last_y = 512;
-    uint16_t x = adc_read(0); // PC0
-    uint16_t y = adc_read(1); // PC1
+    uint16_t x = 1024 - adc_read(0); // PC0
+    uint16_t y = 1024 - adc_read(1); // PC1
 
     if (abs((int16_t)x - (int16_t)last_x) > 32 || abs((int16_t)y - (int16_t)last_y) > 32) {
         event_push(EVENT_JOY_MOVE, (uint8_t)(x >> 2), (uint8_t)(y >> 2));
